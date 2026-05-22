@@ -1,0 +1,11 @@
+{
+  "_comment": "Genres de base de Game Dev Tycoon. idealTechDesignRatio = Tech ÷ Design visé pour maximiser la note (datamining communautaire). >1 = orienté Tech, <1 = orienté Design.",
+  "genres": [
+    { "id": "action",     "name": "Action",     "idealTechDesignRatio": 1.8 },
+    { "id": "adventure",  "name": "Aventure",   "idealTechDesignRatio": 0.4 },
+    { "id": "rpg",         "name": "RPG",        "idealTechDesignRatio": 0.6 },
+    { "id": "strategy",   "name": "Stratégie",  "idealTechDesignRatio": 1.6 },
+    { "id": "simulation", "name": "Simulation", "idealTechDesignRatio": 1.6 },
+    { "id": "casual",     "name": "Casual",     "idealTechDesignRatio": 0.5 }
+  ]
+}

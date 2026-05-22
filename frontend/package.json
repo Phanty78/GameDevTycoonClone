@@ -1,0 +1,19 @@
+{
+  "name": "@gdt/frontend",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --hot ./index.html",
+    "build": "bun build ./index.html --outdir dist --minify"
+  },
+  "dependencies": {
+    "@gdt/contracts": "workspace:*",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0"
+  }
+}

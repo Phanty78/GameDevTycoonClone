@@ -1,0 +1,29 @@
+{
+  "_comment": "Les 9 curseurs de développement de GDT, répartis en 3 phases. designShare = fraction des points générés qui sont du Design (le reste est du Tech). Source : datamining communautaire (split Design/Tech par curseur).",
+  "phases": [
+    {
+      "phase": 1,
+      "sliders": [
+        { "id": "engine",    "name": "Moteur",      "designShare": 0.20 },
+        { "id": "gameplay",  "name": "Gameplay",    "designShare": 0.80 },
+        { "id": "story",     "name": "Histoire",    "designShare": 0.80 }
+      ]
+    },
+    {
+      "phase": 2,
+      "sliders": [
+        { "id": "dialogue",     "name": "Dialogues",       "designShare": 0.90 },
+        { "id": "levelDesign",  "name": "Level design",    "designShare": 0.40 },
+        { "id": "ai",           "name": "IA",              "designShare": 0.20 }
+      ]
+    },
+    {
+      "phase": 3,
+      "sliders": [
+        { "id": "worldDesign", "name": "Game design (monde)", "designShare": 0.60 },
+        { "id": "graphics",    "name": "Graphismes",         "designShare": 0.50 },
+        { "id": "sound",       "name": "Son",                "designShare": 0.60 }
+      ]
+    }
+  ]
+}

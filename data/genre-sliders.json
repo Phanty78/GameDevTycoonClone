@@ -1,0 +1,35 @@
+{
+  "_comment": "Importance de chaque curseur par genre (0.6 = peu important, 1.0 = très important). Sert à mesurer l'adéquation entre l'allocation d'effort du joueur et le profil idéal du genre. Source : gdt-calc developmentFocus[] (valeurs nuancées réelles). Clés = id des sliders de sliders.json. Règle gdt-calc d'affichage en barres : >=0.9 -> ~100%, 0.8 -> ~80%, <0.8 -> faible.",
+  "byGenre": {
+    "action": {
+      "engine": 1.0, "gameplay": 0.9, "story": 0.7,
+      "dialogue": 0.6, "levelDesign": 0.9, "ai": 1.0,
+      "worldDesign": 0.8, "graphics": 1.0, "sound": 0.9
+    },
+    "adventure": {
+      "engine": 0.7, "gameplay": 0.8, "story": 1.0,
+      "dialogue": 1.0, "levelDesign": 0.8, "ai": 0.7,
+      "worldDesign": 1.0, "graphics": 0.9, "sound": 0.8
+    },
+    "rpg": {
+      "engine": 0.7, "gameplay": 0.9, "story": 1.0,
+      "dialogue": 1.0, "levelDesign": 0.9, "ai": 0.8,
+      "worldDesign": 1.0, "graphics": 0.9, "sound": 0.8
+    },
+    "simulation": {
+      "engine": 0.9, "gameplay": 1.0, "story": 0.8,
+      "dialogue": 0.7, "levelDesign": 0.9, "ai": 1.0,
+      "worldDesign": 0.8, "graphics": 1.0, "sound": 0.9
+    },
+    "strategy": {
+      "engine": 0.9, "gameplay": 1.0, "story": 0.8,
+      "dialogue": 0.7, "levelDesign": 1.0, "ai": 0.9,
+      "worldDesign": 0.8, "graphics": 1.0, "sound": 0.9
+    },
+    "casual": {
+      "engine": 0.6, "gameplay": 1.0, "story": 0.7,
+      "dialogue": 0.7, "levelDesign": 1.0, "ai": 0.6,
+      "worldDesign": 0.7, "graphics": 1.0, "sound": 0.9
+    }
+  }
+}
