@@ -1,13 +1,15 @@
 import { Hono } from "hono";
+import { authRoutes } from "./auth/routes";
 
 /**
- * Point d'entrée de l'API. Squelette : seule la route de santé existe.
- * Les routes de jeu (auth, /games, /leaderboard — DESIGN.md §5) viennent ensuite.
- * Toute la logique de jeu vivra dans une couche domaine pure, jamais exposée au front.
+ * Point d'entrée de l'API. Routes d'auth montées (DESIGN.md §5) ; les routes de
+ * jeu (/games, /leaderboard) viennent ensuite, protégées par requireAuth.
+ * Toute la logique de jeu vit dans une couche domaine pure, jamais exposée au front.
  */
 const app = new Hono();
 
 app.get("/health", (c) => c.json({ status: "ok" }));
+app.route("/auth", authRoutes);
 
 const port = Number(process.env.PORT ?? 3000);
 

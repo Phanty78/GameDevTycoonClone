@@ -4,18 +4,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## État du projet
 
-Clone web de **Game Dev Tycoon**. Squelette monorepo + **couche domaine** + **DB Drizzle** en place (étapes 3 et 4 du §10). Le plan d'implémentation complet est dans `docs/DESIGN.md` §10.
+Clone web de **Game Dev Tycoon**. Squelette monorepo + **couche domaine** + **DB Drizzle** + **auth JWT** en place (étapes 3 à 5 du §10). Le plan d'implémentation complet est dans `docs/DESIGN.md` §10.
 
 Avant d'écrire du code, lire `docs/DESIGN.md` : c'est la source de vérité pour l'architecture, le modèle de données, les routes API et les formules de jeu.
 
-**Avancement (§10)** : 1 squelette ✅ · 2 données `/data` ✅ · 3 couche domaine ✅ · 4 DB Drizzle ✅ · 5 auth ⏳ · 6 `POST /games` · 7 leaderboard + cron · 8 front.
+**Avancement (§10)** : 1 squelette ✅ · 2 données `/data` ✅ · 3 couche domaine ✅ · 4 DB Drizzle ✅ · 5 auth ✅ · 6 `POST /games` ⏳ · 7 leaderboard + cron · 8 front.
 
 La **couche domaine** vit dans `backend/src/domain/` (pure, sans I/O, testée en priorité) :
 `scores.ts` (Design/Tech) · `fit.ts` (`profilFit` méthode pénalité-par-écart, `ratioFit` méthode fidèle-GDT) · `review.ts` (`affinity`, `reviewScore`, `drawAlea`, `reviewText`) · `sales.ts` · `index.ts` (`resolveInput` → `computeGame`). Pattern « parse, don't validate » : `resolveInput` est la seule porte d'échec (renvoie un `Result`), `computeGame` est **total et déterministe** (l'aléa est injecté via `rng`). `computeGame` ne produit pas `gameId`/`newBalance` (concerns DB) — la route les ajoute.
 ⚠️ L'affinité genre×sujet (`topics.json`) s'indexe via `topics._meta.genreOrder`, **jamais** via l'ordre de `genres.json` (strategy/simulation y sont inversés). `affinity()` force `genreOrder` en argument pour verrouiller ça.
 Valeurs **à calibrer** isolées en constantes nommées : `SALES_SCALE`, `FALLBACK_MARKET_SIZE` (`sales.ts`), `REVIEW_LABELS` (`review.ts`).
 
-La **DB** vit dans `backend/src/db/` : `schema.ts` (4 tables : `users`, `seasons`, `games`, `scores`) + `index.ts` (client Drizzle, échoue tôt si `DATABASE_URL` manque). C'est de l'**I/O** → la couche domaine ne l'importe pas. PK `serial`. Argent (`balance`/`sales`/`revenue`/`value`) en `bigint` mode number (un `int4` plafonnerait), scores en `integer`, `effort` en `jsonb` typé `$type<Effort>()`. FK `userId` en `ON DELETE CASCADE`. `games` **sans** `seasonId` (purgée au reset) ; `scores` porte `seasonId` + contrainte unique `(userId, seasonId)` (1 ligne/saison, upsert). Migrations versionnées dans `backend/drizzle/` (généré, ignoré par Biome). Postgres dev via `docker-compose.yml` (`DATABASE_URL=postgres://gdt:gdt@localhost:5432/gdt`).
+La **DB** vit dans `backend/src/db/` : `schema.ts` (4 tables : `users`, `seasons`, `games`, `scores`) + `index.ts` (client Drizzle, échoue tôt si `DATABASE_URL` manque). C'est de l'**I/O** → la couche domaine ne l'importe pas. PK `serial`. Argent (`balance`/`sales`/`revenue`/`value`) en `bigint` mode number (un `int4` plafonnerait), scores en `integer`, `effort` en `jsonb` typé `$type<Effort>()`. FK `userId` en `ON DELETE CASCADE`. `games` **sans** `seasonId` (purgée au reset) ; `scores` porte `seasonId` + contrainte unique `(userId, seasonId)` (1 ligne/saison, upsert). Migrations versionnées dans `backend/drizzle/` (généré, ignoré par Biome). Postgres dev via `docker-compose.yml` (`DATABASE_URL=postgres://gdt:gdt@localhost:5432/gdt`). Capital de départ : `STARTING_BALANCE = 100_000` (constante exportée de `schema.ts`, défaut SQL de `users.balance`, **à calibrer**).
+
+L'**auth** vit dans `backend/src/auth/` (I/O) : `passwords.ts` (`Bun.password`, argon2id), `tokens.ts` (`signToken`, JWT HS256, `JWT_EXPIRY_SECONDS` = 7 j, claim `exp`), `middleware.ts` (`requireAuth()` = middleware `hono/jwt` ; `getUserId(c)` lit `sub`), `routes.ts` (`POST /auth/register` → 201 `{userId}`, `POST /auth/login` → `{token}`). Sécurité : mdp jamais en clair/renvoyé ; login renvoie une **erreur générique** (anti-énumération de comptes) ; email pris → 409 (via `isUniqueViolation`, qui inspecte `error.cause.code === 23505` car Drizzle enveloppe l'erreur pg). Secret : `JWT_SECRET` (`.env`). Ids exposés en `string` côté contrat (`String(id)`) bien que PK `serial`.
+
+⚠️ Le **runtime back** (comme drizzle) doit voir le `.env` **racine** : on lance donc le serveur depuis la racine (`bun run --hot backend/src/index.ts`), cwd = racine → Bun charge le `.env` racine en dev ; en prod l'env est injecté par la plateforme.
 
 ## Stack cible (à mettre en place)
 
@@ -127,4 +131,4 @@ DB (depuis `backend/`, après `docker compose up -d` à la racine) :
 
 ⚠️ `db:migrate`/`db:push` chargent le `.env` **racine** via `bun --env-file=../.env` (le script tourne dans `backend/`, où Bun ne verrait pas le `.env` racine seul). `db:generate` n'a pas besoin de la DB.
 
-Route de santé back : `GET /health` → `{ "status": "ok" }`.
+Routes back : `GET /health` → `{ "status": "ok" }` · `POST /auth/register` · `POST /auth/login` (DESIGN §5).

@@ -5,7 +5,7 @@
   "type": "module",
   "workspaces": ["backend", "frontend", "contracts"],
   "scripts": {
-    "dev:back": "bun --filter @gdt/backend dev",
+    "dev:back": "bun run --hot backend/src/index.ts",
     "dev:front": "bun --filter @gdt/frontend dev",
     "test": "bun --filter '*' test",
     "lint": "biome check .",

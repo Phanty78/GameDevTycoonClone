@@ -8,6 +8,13 @@
       "when": 1779526294275,
       "tag": "0000_amusing_captain_flint",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1779528077451,
+      "tag": "0001_worthless_the_stranger",
+      "breakpoints": true
     }
   ]
 }

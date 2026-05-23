@@ -25,12 +25,17 @@ import {
   unique,
 } from "drizzle-orm/pg-core";
 
+/** Capital de départ d'un nouveau joueur (à calibrer, cf. docs/DESIGN.md §6). */
+export const STARTING_BALANCE = 100_000;
+
 /** Joueur. Le solde est le capital disponible pour développer des jeux. */
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
-  balance: bigint("balance", { mode: "number" }).notNull().default(0),
+  balance: bigint("balance", { mode: "number" })
+    .notNull()
+    .default(STARTING_BALANCE),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
