@@ -4,16 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## État du projet
 
-Clone web de **Game Dev Tycoon**. Squelette monorepo en place + **couche domaine implémentée** (étape 3 du §10). Le plan d'implémentation complet est dans `docs/DESIGN.md` §10.
+Clone web de **Game Dev Tycoon**. Squelette monorepo + **couche domaine** + **DB Drizzle** en place (étapes 3 et 4 du §10). Le plan d'implémentation complet est dans `docs/DESIGN.md` §10.
 
 Avant d'écrire du code, lire `docs/DESIGN.md` : c'est la source de vérité pour l'architecture, le modèle de données, les routes API et les formules de jeu.
 
-**Avancement (§10)** : 1 squelette ✅ · 2 données `/data` ✅ · 3 couche domaine ✅ · 4 DB Drizzle ⏳ · 5 auth · 6 `POST /games` · 7 leaderboard + cron · 8 front.
+**Avancement (§10)** : 1 squelette ✅ · 2 données `/data` ✅ · 3 couche domaine ✅ · 4 DB Drizzle ✅ · 5 auth ⏳ · 6 `POST /games` · 7 leaderboard + cron · 8 front.
 
 La **couche domaine** vit dans `backend/src/domain/` (pure, sans I/O, testée en priorité) :
 `scores.ts` (Design/Tech) · `fit.ts` (`profilFit` méthode pénalité-par-écart, `ratioFit` méthode fidèle-GDT) · `review.ts` (`affinity`, `reviewScore`, `drawAlea`, `reviewText`) · `sales.ts` · `index.ts` (`resolveInput` → `computeGame`). Pattern « parse, don't validate » : `resolveInput` est la seule porte d'échec (renvoie un `Result`), `computeGame` est **total et déterministe** (l'aléa est injecté via `rng`). `computeGame` ne produit pas `gameId`/`newBalance` (concerns DB) — la route les ajoute.
 ⚠️ L'affinité genre×sujet (`topics.json`) s'indexe via `topics._meta.genreOrder`, **jamais** via l'ordre de `genres.json` (strategy/simulation y sont inversés). `affinity()` force `genreOrder` en argument pour verrouiller ça.
 Valeurs **à calibrer** isolées en constantes nommées : `SALES_SCALE`, `FALLBACK_MARKET_SIZE` (`sales.ts`), `REVIEW_LABELS` (`review.ts`).
+
+La **DB** vit dans `backend/src/db/` : `schema.ts` (4 tables : `users`, `seasons`, `games`, `scores`) + `index.ts` (client Drizzle, échoue tôt si `DATABASE_URL` manque). C'est de l'**I/O** → la couche domaine ne l'importe pas. PK `serial`. Argent (`balance`/`sales`/`revenue`/`value`) en `bigint` mode number (un `int4` plafonnerait), scores en `integer`, `effort` en `jsonb` typé `$type<Effort>()`. FK `userId` en `ON DELETE CASCADE`. `games` **sans** `seasonId` (purgée au reset) ; `scores` porte `seasonId` + contrainte unique `(userId, seasonId)` (1 ligne/saison, upsert). Migrations versionnées dans `backend/drizzle/` (généré, ignoré par Biome). Postgres dev via `docker-compose.yml` (`DATABASE_URL=postgres://gdt:gdt@localhost:5432/gdt`).
 
 ## Stack cible (à mettre en place)
 
@@ -114,5 +116,15 @@ Squelette monorepo en place (`bun install` à la racine câble les 3 workspaces)
 | `bun run format` | `biome format --write .` |
 | `bun run typecheck` | `tsc --noEmit` sur tous les paquets |
 
-Route de santé back : `GET /health` → `{ "status": "ok" }`. Drizzle/Postgres pas encore branchés
-(étape 4 du §10) — commandes `bunx drizzle-kit …` à ajouter à ce moment-là.
+DB (depuis `backend/`, après `docker compose up -d` à la racine) :
+
+| Commande | Effet |
+|---|---|
+| `docker compose up -d` | Lance le Postgres de dev (racine) |
+| `bun run db:generate` | Génère une migration SQL depuis `schema.ts` (offline) |
+| `bun run db:migrate` | Applique les migrations en attente (charge le `.env` racine) |
+| `bun run db:push` | Pousse le schéma directement sans migration (prototypage) |
+
+⚠️ `db:migrate`/`db:push` chargent le `.env` **racine** via `bun --env-file=../.env` (le script tourne dans `backend/`, où Bun ne verrait pas le `.env` racine seul). `db:generate` n'a pas besoin de la DB.
+
+Route de santé back : `GET /health` → `{ "status": "ok" }`.

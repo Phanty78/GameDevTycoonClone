@@ -1,0 +1,17 @@
+# Postgres de développement. `docker compose up -d` suffit.
+# La prod (Railway) fournit son propre DATABASE_URL ; ce service n'est que pour le dev local.
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gdt
+      POSTGRES_PASSWORD: gdt
+      POSTGRES_DB: gdt
+    ports:
+      - "5432:5432"
+    volumes:
+      - gdt_pgdata:/var/lib/postgresql/data
+
+volumes:
+  gdt_pgdata:
