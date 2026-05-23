@@ -52,6 +52,17 @@ Ces invariants pilotent tout le reste — les respecter dans tout code écrit :
 - **Génération fonction par fonction.** Lors de la génération de code, produire une fonction à la fois, en expliquant pourquoi cette fonction existe, à quoi elle sert, et en justifiant chaque élément.
 - **Simplicité avant tout.** Garder le code le plus simple et épuré possible. La suringénierie est bannie.
 
+## Versionnage
+
+- **Dépendances** : notation **`MAJEUR.*.*`** (ex. `react: "19.*.*"`, `hono: "4.*.*"`). On fige la version majeure, mineur et patch en `*` (suivent les dernières). Exceptions : `workspace:*` (paquets internes `@gdt/*`) et `latest` restent tels quels.
+- **Version du programme** (`version` des `package.json`) : reste en SemVer classique, démarre à `0.0.1`.
+- **Demande de commit** : penser à incrémenter la `version` du/des `package.json` concernés avant de committer.
+
+## Commits
+
+- **Message court, style caveman** : phrase brève, fragments OK, pas de fioritures.
+- **Jamais de co-auteur** : ne jamais ajouter de ligne `Co-Authored-By` ni mentionner Claude/Claude Code comme co-auteur.
+
 ## Données de jeu (`/data`)
 
 Tables de référence consommées par la couche domaine. Toutes dataminées de GDT (sources et lacunes dans `data/README.md`). Valeurs **à calibrer** (cf. `_comment` en tête de chaque fichier).

@@ -5,9 +5,9 @@
     "": {
       "name": "gdt-web",
       "devDependencies": {
-        "@biomejs/biome": "^1.9.4",
+        "@biomejs/biome": "1.*.*",
         "@types/bun": "latest",
-        "typescript": "^5.7.0",
+        "typescript": "5.*.*",
       },
     },
     "backend": {
@@ -15,7 +15,7 @@
       "version": "0.0.1",
       "dependencies": {
         "@gdt/contracts": "workspace:*",
-        "hono": "^4.6.0",
+        "hono": "4.*.*",
       },
     },
     "contracts": {
@@ -27,12 +27,12 @@
       "version": "0.0.1",
       "dependencies": {
         "@gdt/contracts": "workspace:*",
-        "react": "^19.0.0",
-        "react-dom": "^19.0.0",
+        "react": "19.*.*",
+        "react-dom": "19.*.*",
       },
       "devDependencies": {
-        "@types/react": "^19.0.0",
-        "@types/react-dom": "^19.0.0",
+        "@types/react": "19.*.*",
+        "@types/react-dom": "19.*.*",
       },
     },
   },
