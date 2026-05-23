@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "bun --hot ./index.html",
-    "build": "bun build ./index.html --outdir dist --minify"
+    "build": "bun build ./index.html --outdir dist --minify",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@gdt/contracts": "workspace:*",

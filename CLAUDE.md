@@ -4,9 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## État du projet
 
-Clone web de **Game Dev Tycoon**. Le dépôt est en phase de **cadrage** : il ne contient pour l'instant que la conception (`docs/DESIGN.md`) et les **données de jeu dataminées** (`/data`). Aucun code applicatif n'existe encore — le plan d'implémentation est détaillé dans `docs/DESIGN.md` §10.
+Clone web de **Game Dev Tycoon**. Squelette monorepo en place + **couche domaine implémentée** (étape 3 du §10). Le plan d'implémentation complet est dans `docs/DESIGN.md` §10.
 
 Avant d'écrire du code, lire `docs/DESIGN.md` : c'est la source de vérité pour l'architecture, le modèle de données, les routes API et les formules de jeu.
+
+**Avancement (§10)** : 1 squelette ✅ · 2 données `/data` ✅ · 3 couche domaine ✅ · 4 DB Drizzle ⏳ · 5 auth · 6 `POST /games` · 7 leaderboard + cron · 8 front.
+
+La **couche domaine** vit dans `backend/src/domain/` (pure, sans I/O, testée en priorité) :
+`scores.ts` (Design/Tech) · `fit.ts` (`profilFit` méthode pénalité-par-écart, `ratioFit` méthode fidèle-GDT) · `review.ts` (`affinity`, `reviewScore`, `drawAlea`, `reviewText`) · `sales.ts` · `index.ts` (`resolveInput` → `computeGame`). Pattern « parse, don't validate » : `resolveInput` est la seule porte d'échec (renvoie un `Result`), `computeGame` est **total et déterministe** (l'aléa est injecté via `rng`). `computeGame` ne produit pas `gameId`/`newBalance` (concerns DB) — la route les ajoute.
+⚠️ L'affinité genre×sujet (`topics.json`) s'indexe via `topics._meta.genreOrder`, **jamais** via l'ordre de `genres.json` (strategy/simulation y sont inversés). `affinity()` force `genreOrder` en argument pour verrouiller ça.
+Valeurs **à calibrer** isolées en constantes nommées : `SALES_SCALE`, `FALLBACK_MARKET_SIZE` (`sales.ts`), `REVIEW_LABELS` (`review.ts`).
 
 ## Stack cible (à mettre en place)
 
@@ -44,6 +51,12 @@ Ces invariants pilotent tout le reste — les respecter dans tout code écrit :
 - **`packages/contracts` ne contient que des types**, pas de logique. Front et back partagent les contrats (inputs/payloads), pas l'algorithme.
 - **`Game` n'a pas de `seasonId`** : la table est entièrement vidée à chaque reset de saison. Seul `Score` porte la saison (hall of fame). Voir le modèle de données et les règles de cycle de vie en §4.
 - **Reset de saison** = transaction unique idempotente (clôturer saison active → vider `Game` → créer nouvelle saison). Déclenché par un cron Railway externe, pas in-process.
+
+## Erreurs & secrets
+
+- **Remontée d'erreurs centralisée** : `backend/src/lib/errors.ts` → `reportError(error, context?, deps?)` poste sur un webhook Discord. **Best-effort** : ne jette jamais (une panne du reporter ne doit pas masquer l'erreur d'origine). Webhook absent = remontée désactivée. C'est de l'**I/O** → la couche domaine ne l'importe pas ; appelée dans les `catch` des routes.
+- **Secrets via `.env`** (chargé automatiquement par Bun). `.env` est **gitignoré** ; `.env.example` (commité, sans valeur) documente les variables. Webhook erreurs : `DISCORD_ERROR_WEBHOOK`.
+- **Ne jamais commiter de secret.** Toute valeur sensible passe par `.env` + une entrée dans `.env.example`.
 
 ## Règles de style de code
 

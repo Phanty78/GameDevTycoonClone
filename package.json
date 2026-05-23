@@ -10,7 +10,7 @@
     "test": "bun --filter '*' test",
     "lint": "biome check .",
     "format": "biome format --write .",
-    "typecheck": "bun --filter '*' exec tsc --noEmit"
+    "typecheck": "bun --filter='*' run typecheck"
   },
   "devDependencies": {
     "@biomejs/biome": "1.*.*",
