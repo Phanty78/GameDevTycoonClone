@@ -61,6 +61,7 @@ Ces invariants pilotent tout le reste — les respecter dans tout code écrit :
 ## Commits
 
 - **Message court, style caveman** : phrase brève, fragments OK, pas de fioritures.
+- **Préfixe de type** : commencer par un tag en majuscules suivi de ` - `, ex. `FIX - ...`, `REF - ...`, `FEAT - ...`.
 - **Jamais de co-auteur** : ne jamais ajouter de ligne `Co-Authored-By` ni mentionner Claude/Claude Code comme co-auteur.
 
 ## Données de jeu (`/data`)
