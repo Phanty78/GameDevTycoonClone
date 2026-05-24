@@ -5,3 +5,9 @@ dist/
 .env.*
 !.env.example
 .DS_Store
+
+# graphify (graphe de connaissances généré)
+graphify-out/
+
+# config Claude locale (perso) — settings.json reste committable
+.claude/settings.local.json
